@@ -1,0 +1,24 @@
+{
+  "name": "klontong-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt dev --port 3000",
+    "build": "nuxt build",
+    "preview": "nuxt preview",
+    "lint": "eslint . --fix"
+  },
+  "dependencies": {
+    "@pinia/nuxt": "^0.5.1",
+    "nuxt": "^3.8.0",
+    "pinia": "^2.1.7",
+    "vue": "^3.3.8",
+    "@vueuse/core": "^10.5.0",
+    "@vueuse/nuxt": "^10.5.0"
+  },
+  "devDependencies": {
+    "@nuxtjs/tailwindcss": "^6.8.1",
+    "@nuxt/icon": "^1.0.0",
+    "typescript": "^5.2.2"
+  }
+}
