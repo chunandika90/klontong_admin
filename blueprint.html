@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blueprint — Klontong Admin</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.7; }
+
+    header {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      color: white; padding: 48px 0;
+      text-align: center;
+    }
+    header h1 { font-size: 2.4rem; font-weight: 800; letter-spacing: -0.5px; }
+    header p { margin-top: 8px; font-size: 1rem; opacity: 0.85; }
+    header .meta { margin-top: 16px; display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; }
+    header .badge {
+      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 99px; padding: 4px 14px; font-size: 0.82rem; font-weight: 500;
+    }
+
+    .container { max-width: 900px; margin: 0 auto; padding: 48px 24px; }
+
+    .toc {
+      background: white; border: 1px solid #e2e8f0; border-radius: 12px;
+      padding: 24px 28px; margin-bottom: 40px;
+    }
+    .toc h2 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 12px; }
+    .toc ol { padding-left: 20px; }
+    .toc li { margin-bottom: 6px; }
+    .toc a { color: #4f46e5; text-decoration: none; font-size: 0.9rem; }
+    .toc a:hover { text-decoration: underline; }
+
+    section { margin-bottom: 48px; }
+    h2.section-title {
+      font-size: 1.4rem; font-weight: 700; color: #0f172a;
+      border-left: 4px solid #4f46e5; padding-left: 14px;
+      margin-bottom: 20px;
+    }
+    h3 { font-size: 1rem; font-weight: 600; color: #334155; margin: 20px 0 10px; }
+
+    p { margin-bottom: 14px; color: #475569; font-size: 0.95rem; }
+
+    ul, ol { padding-left: 22px; margin-bottom: 14px; }
+    li { color: #475569; font-size: 0.95rem; margin-bottom: 6px; }
+    li strong { color: #1e293b; }
+
+    pre {
+      background: #0f172a; color: #e2e8f0; border-radius: 10px;
+      padding: 20px 24px; font-size: 0.82rem; line-height: 1.7;
+      overflow-x: auto; margin: 16px 0;
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    }
+    code { background: #f1f5f9; color: #4f46e5; padding: 2px 6px; border-radius: 4px; font-size: 0.85em; }
+
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.9rem; }
+    thead tr { background: #f1f5f9; }
+    th { text-align: left; padding: 10px 14px; color: #475569; font-weight: 600; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    td { padding: 10px 14px; border-bottom: 1px solid #e2e8f0; color: #475569; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f8fafc; }
+
+    .card {
+      background: white; border: 1px solid #e2e8f0; border-radius: 12px;
+      padding: 24px; margin-bottom: 16px;
+    }
+    .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 640px) { .card-grid { grid-template-columns: 1fr; } }
+
+    .tag {
+      display: inline-block; padding: 2px 10px; border-radius: 99px;
+      font-size: 0.75rem; font-weight: 600; margin: 2px;
+    }
+    .tag-blue { background: #ede9fe; color: #4f46e5; }
+    .tag-green { background: #dcfce7; color: #16a34a; }
+    .tag-orange { background: #fff7ed; color: #ea580c; }
+    .tag-red { background: #fef2f2; color: #dc2626; }
+
+    .callout {
+      background: #eff6ff; border-left: 4px solid #3b82f6;
+      border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 16px 0;
+      font-size: 0.9rem; color: #1e40af;
+    }
+    .callout.warning { background: #fffbeb; border-color: #f59e0b; color: #92400e; }
+    .callout.success { background: #f0fdf4; border-color: #22c55e; color: #166534; }
+
+    footer { text-align: center; padding: 32px; color: #94a3b8; font-size: 0.82rem; border-top: 1px solid #e2e8f0; margin-top: 48px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Blueprint — Klontong Admin</h1>
+  <p>Architecture Note & Technical Decision Document</p>
+  <div class="meta">
+    <span class="badge">Lead Engineer Take-Home Test</span>
+    <span class="badge">Nuxt 3 + NestJS + PostgreSQL</span>
+    <span class="badge">Docker Compose</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- TOC -->
+  <div class="toc">
+    <h2>Daftar Isi</h2>
+    <ol>
+      <li><a href="#stack">Pilihan Stack & Database</a></li>
+      <li><a href="#backend">Struktur Backend (NestJS)</a></li>
+      <li><a href="#frontend">Struktur Frontend (Nuxt 3)</a></li>
+      <li><a href="#api">API Contract</a></li>
+      <li><a href="#tradeoff">Trade-off & Keputusan</a></li>
+      <li><a href="#scaling">Skalabilitas: 100 → 100.000 Produk</a></li>
+      <li><a href="#rbac">Rencana RBAC</a></li>
+      <li><a href="#audit">Rencana Audit Logging</a></li>
+      <li><a href="#gaps">Yang Sengaja Tidak Dibangun</a></li>
+      <li><a href="#production">Production Gaps</a></li>
+    </ol>
+  </div>
+
+  <!-- 1. Stack -->
+  <section id="stack">
+    <h2 class="section-title">1. Pilihan Stack & Database</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h3>Mengapa PostgreSQL?</h3>
+        <ul>
+          <li><strong>Skema relasional</strong> — products punya FK ke categories & users. Natural untuk SQL.</li>
+          <li><strong>Query kompleks</strong> — filtering, sorting, pagination lebih mudah dioptimasi dengan index SQL.</li>
+          <li><strong>Constraint database-level</strong> — SKU UNIQUE, NOT NULL lebih robust.</li>
+          <li><strong>Soft delete</strong> — DeleteDateColumn TypeORM berjalan mulus.</li>
+          <li><strong>Ekosistem mature</strong> — pg_trgm, partitioning, read replicas untuk scaling.</li>
+        </ul>
+        <p>MongoDB cocok jika skema sering berubah atau data sangat denormalisasi — tidak relevan di kasus ini.</p>
+      </div>
+      <div class="card">
+        <h3>Stack Teknologi</h3>
+        <ul>
+          <li><strong>Frontend:</strong> Nuxt 3 (SPA mode, ssr: false)</li>
+          <li><strong>State:</strong> Pinia + localStorage persistence</li>
+          <li><strong>Styling:</strong> Tailwind CSS</li>
+          <li><strong>Backend:</strong> NestJS + TypeORM</li>
+          <li><strong>Database:</strong> PostgreSQL 15</li>
+          <li><strong>Auth:</strong> JWT (7d expiry) + bcrypt</li>
+          <li><strong>Docs:</strong> Swagger / OpenAPI</li>
+          <li><strong>Deploy:</strong> Docker Compose</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout success">
+      <strong>Kenapa SSR dimatikan?</strong> Klontong Admin adalah internal admin tool — tidak butuh SEO atau initial load optimization. SPA mode menghilangkan kompleksitas SSR hydration yang menyebabkan bug context di production build.
+    </div>
+  </section>
+
+  <!-- 2. Backend -->
+  <section id="backend">
+    <h2 class="section-title">2. Struktur Backend (NestJS)</h2>
+    <pre>src/
+├── auth/               # Feature module: register, login, JWT
+│   ├── dto/            # RegisterDto, LoginDto (class-validator)
+│   ├── entities/       # User entity (bcrypt hash on insert)
+│   ├── guards/         # JwtAuthGuard — applied per controller
+│   └── strategies/     # PassportJS JWT strategy
+├── products/           # Feature module: CRUD + list + stats
+│   ├── dto/            # CreateProductDto, UpdateProductDto, QueryProductDto
+│   ├── entities/       # Product entity (soft-delete via DeleteDateColumn)
+│   ├── products.service.ts    # Business logic + transaction
+│   └── products.controller.ts
+├── categories/         # Feature module: category management
+├── database/
+│   ├── data-source.ts  # TypeORM DataSource untuk CLI
+│   └── seeds/          # Seeder: 8 kategori + ~100 produk + 2 user
+├── common/
+│   ├── filters/        # Global exception filter
+│   └── interceptors/   # Timeout interceptor (30s)
+├── health.controller.ts  # GET /health untuk load balancer
+└── app.module.ts       # Root: TypeORM async config, feature modules</pre>
+
+    <h3>Prinsip Utama</h3>
+    <ul>
+      <li>Setiap domain punya module sendiri — tidak ada circular dependency</li>
+      <li>Service berisi seluruh business logic; controller hanya routing + guard</li>
+      <li><code>ValidationPipe</code> global dengan <code>whitelist: true</code> — payload tidak dikenal otomatis dibuang</li>
+      <li>Semua write operation pakai <strong>database transaction</strong> untuk atomicity</li>
+      <li>Response list selalu wrap <code>&#123; data, meta &#125;</code> untuk konsistensi pagination</li>
+    </ul>
+  </section>
+
+  <!-- 3. Frontend -->
+  <section id="frontend">
+    <h2 class="section-title">3. Struktur Frontend (Nuxt 3)</h2>
+    <pre>apps/frontend/
+├── pages/
+│   ├── index.vue              # Dashboard (stats, chart, recent)
+│   ├── auth/login.vue         # Login page
+│   ├── auth/register.vue      # Register page
+│   └── products/
+│       ├── index.vue          # List + Create modal + Edit modal
+│       └── [id]/
+│           └── index.vue      # Detail page + Edit modal
+├── stores/
+│   ├── auth.store.ts          # Token + user, persist localStorage
+│   ├── products.store.ts      # List + query state (filter, pagination)
+│   └── categories.store.ts    # Fetch once, cached
+├── services/                  # Pure API call layer (no UI logic)
+│   ├── api.ts                 # $fetch factory + auto Bearer token
+│   ├── products.service.ts
+│   └── categories.service.ts
+├── components/
+│   └── products/ProductForm.vue  # Shared form create + edit
+├── middleware/
+│   └── auth.ts                # Redirect ke login jika no token
+├── layouts/
+│   ├── default.vue            # Navbar + logout
+│   └── auth.vue               # Clean layout untuk login/register
+└── composables/
+    └── useDebounce.ts         # 400ms debounce untuk search</pre>
+
+    <h3>Pola State Management</h3>
+    <div class="card-grid">
+      <div class="card">
+        <h3>useAuthStore</h3>
+        <p>Sumber kebenaran untuk auth. Token disimpan di localStorage, di-load saat middleware berjalan. Logout clear semua state.</p>
+      </div>
+      <div class="card">
+        <h3>useProductsStore</h3>
+        <p>Menyimpan query state (filter, sort, page) sehingga saat navigasi kembali ke list, state tidak reset.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. API -->
+  <section id="api">
+    <h2 class="section-title">4. API Contract</h2>
+    <p>Semua endpoint berawalan <code>/api</code>. Response selalu JSON. Auth via Bearer JWT di header <code>Authorization</code>.</p>
+
+    <table>
+      <thead><tr><th>Method</th><th>Path</th><th>Auth</th><th>Deskripsi</th></tr></thead>
+      <tbody>
+        <tr><td>POST</td><td>/auth/register</td><td>—</td><td>Register user baru</td></tr>
+        <tr><td>POST</td><td>/auth/login</td><td>—</td><td>Login, dapat JWT token</td></tr>
+        <tr><td>GET</td><td>/auth/me</td><td>JWT</td><td>Info user yang login</td></tr>
+        <tr><td>GET</td><td>/products</td><td>JWT</td><td>List produk (pagination, search, filter, sort)</td></tr>
+        <tr><td>GET</td><td>/products/stats</td><td>JWT</td><td>Dashboard stats + per-kategori count</td></tr>
+        <tr><td>GET</td><td>/products/:id</td><td>JWT</td><td>Detail produk</td></tr>
+        <tr><td>POST</td><td>/products</td><td>JWT</td><td>Buat produk baru</td></tr>
+        <tr><td>PATCH</td><td>/products/:id</td><td>JWT</td><td>Update produk</td></tr>
+        <tr><td>DELETE</td><td>/products/:id</td><td>JWT</td><td>Soft-delete (arsip) produk</td></tr>
+        <tr><td>PATCH</td><td>/products/:id/restore</td><td>JWT</td><td>Restore produk yang diarsip</td></tr>
+        <tr><td>GET</td><td>/categories</td><td>JWT</td><td>List semua kategori</td></tr>
+        <tr><td>GET</td><td>/health</td><td>—</td><td>Health check</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Pagination Response</h3>
+    <pre>&#123;
+  "data": [ ...products ],
+  "meta": &#123; "total": 100, "page": 1, "limit": 10, "totalPages": 10 &#125;
+&#125;</pre>
+
+    <h3>Error Response</h3>
+    <pre>&#123; "statusCode": 400, "message": ["name should not be empty"], "error": "Bad Request" &#125;</pre>
+
+    <div class="callout">
+      Swagger UI tersedia di <strong>http://localhost:4001/api/docs</strong> untuk eksplorasi interaktif semua endpoint.
+    </div>
+  </section>
+
+  <!-- 5. Trade-off -->
+  <section id="tradeoff">
+    <h2 class="section-title">5. Trade-off & Keputusan</h2>
+    <table>
+      <thead><tr><th>Yang Tidak Dibangun</th><th>Alasan</th></tr></thead>
+      <tbody>
+        <tr><td>Role-based guards di backend</td><td>Semua route hanya require JWT; tidak ada perbedaan admin vs staff di server</td></tr>
+        <tr><td>TypeORM migration files</td><td>Pakai synchronize: true di dev — lebih cepat iterate, tapi tidak production-safe</td></tr>
+        <tr><td>Refresh token</td><td>JWT 7d cukup untuk assignment; production butuh refresh token + blacklist</td></tr>
+        <tr><td>Integration test</td><td>Unit test ProductsService cukup untuk scope ini</td></tr>
+        <tr><td>Image upload</td><td>Pakai URL input; S3 integration butuh waktu lebih</td></tr>
+        <tr><td>SSR mode</td><td>Admin panel tidak butuh SEO; SPA mode lebih simpel dan stabil</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 6. Scaling -->
+  <section id="scaling">
+    <h2 class="section-title">6. Skalabilitas: 100 → 100.000 Produk</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h3>Database</h3>
+        <ul>
+          <li>Index komposit: <code>(category_id, is_active, deleted_at)</code></li>
+          <li>GIN index <code>pg_trgm</code> pada <code>name</code> dan <code>sku</code> untuk LIKE search</li>
+          <li>Table partitioning berdasarkan <code>category_id</code></li>
+          <li>Read replicas untuk query berat</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Backend</h3>
+        <ul>
+          <li>Ganti LIKE dengan PostgreSQL full-text search (<code>tsvector</code>)</li>
+          <li>Redis caching untuk list produk (TTL ~30s)</li>
+          <li>CQRS pattern — pisahkan read/write handler</li>
+          <li>TypeORM connection pool tuning (<code>max: 20</code>)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Frontend</h3>
+        <ul>
+          <li>Virtual scrolling untuk list panjang</li>
+          <li>CDN untuk static assets</li>
+          <li>Lazy load komponen berat</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Infrastructure</h3>
+        <ul>
+          <li>Kubernetes / managed container service</li>
+          <li>Load balancer dengan health check</li>
+          <li>Horizontal scaling backend (stateless)</li>
+          <li>S3 + CDN untuk image hosting</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. RBAC -->
+  <section id="rbac">
+    <h2 class="section-title">7. Rencana RBAC</h2>
+    <p>Saat ini <code>User.role</code> sudah ada (<code>admin</code> | <code>staff</code>). JWT payload sudah include <code>role</code> — tidak perlu DB lookup tambahan per request.</p>
+    <h3>Implementasi</h3>
+    <ol>
+      <li>Buat <code>RolesGuard</code> yang membaca decorator <code>@Roles('admin')</code></li>
+      <li>Apply ke endpoint sensitif: POST/DELETE products, POST categories</li>
+      <li>Staff hanya bisa read + update stok</li>
+    </ol>
+    <pre>@Roles('admin')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Delete(':id')
+remove(@Param('id') id: number) &#123;
+  return this.productsService.remove(id);
+&#125;</pre>
+  </section>
+
+  <!-- 8. Audit -->
+  <section id="audit">
+    <h2 class="section-title">8. Rencana Audit Logging</h2>
+    <pre>CREATE TABLE audit_logs (
+  id         SERIAL PRIMARY KEY,
+  user_id    INT REFERENCES users(id),
+  action     VARCHAR(50),   -- CREATE, UPDATE, DELETE, RESTORE
+  entity     VARCHAR(50),   -- products, categories
+  entity_id  INT,
+  before     JSONB,         -- snapshot sebelum perubahan
+  after      JSONB,         -- snapshot sesudah perubahan
+  ip_address VARCHAR(45),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);</pre>
+    <p>Implementasi via NestJS <strong>interceptor</strong> atau TypeORM <strong>subscriber</strong> — tidak perlu modifikasi service yang sudah ada.</p>
+  </section>
+
+  <!-- 9. Not Built -->
+  <section id="gaps">
+    <h2 class="section-title">9. Yang Sengaja Tidak Dibangun</h2>
+    <ul>
+      <li><strong>Email verification</strong> — tidak ada SMTP setup; tidak kritis untuk assignment</li>
+      <li><strong>Cursor pagination</strong> — offset pagination cukup untuk 100 produk</li>
+      <li><strong>Optimistic UI update</strong> — menambah kompleksitas state tanpa manfaat nyata di skala ini</li>
+      <li><strong>Unit test frontend</strong> — backend unit test lebih kritis; Vitest setup butuh waktu lebih</li>
+      <li><strong>CI/CD pipeline</strong> — Docker Compose cukup untuk deliverable; GitHub Actions bisa ditambah setelah</li>
+    </ul>
+  </section>
+
+  <!-- 10. Production Gaps -->
+  <section id="production">
+    <h2 class="section-title">10. Production Gaps</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h3>🔒 Security</h3>
+        <ul>
+          <li>JWT secret wajib panjang & random</li>
+          <li>Rate limiting — endpoint login rentan brute-force</li>
+          <li>Helmet untuk HTTP security headers</li>
+          <li>HTTPS wajib di production</li>
+          <li>Input sanitization XSS pada description</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>⚡ Performance</h3>
+        <ul>
+          <li>Tidak ada caching layer (Redis)</li>
+          <li>LIKE %keyword% tidak pakai index</li>
+          <li>Image hosting masih URL eksternal</li>
+          <li>Connection pool belum dikonfigurasi</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>📊 Observability</h3>
+        <ul>
+          <li>Tidak ada structured logging (Winston/Pino)</li>
+          <li>Tidak ada request tracing / correlation ID</li>
+          <li>Tidak ada APM (Sentry, Datadog)</li>
+          <li>Error frontend tidak dilaporkan</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🚀 Deployment</h3>
+        <ul>
+          <li>Docker Compose hanya untuk development</li>
+          <li>synchronize: true tidak production-safe</li>
+          <li>Tidak ada graceful shutdown</li>
+          <li>Tidak ada backup otomatis database</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🧪 Testing</h3>
+        <ul>
+          <li>Hanya unit test ProductsService</li>
+          <li>Tidak ada integration test (real DB)</li>
+          <li>Tidak ada e2e test (Playwright/Cypress)</li>
+          <li>Tidak ada contract test frontend ↔ backend</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🗄️ Data Migration</h3>
+        <ul>
+          <li>Perlu generate migration awal dari synchronize</li>
+          <li>TypeORM tidak auto-drop kolom</li>
+          <li>Butuh strategi backup PostgreSQL</li>
+          <li>Zero-downtime migration belum direncanakan</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout warning">
+      Semua gap di atas disadari penuh. Solusi ini dirancang sebagai <strong>"cukup untuk assignment"</strong> yang bisa dikembangkan ke production dengan penambahan layer-layer di atas secara bertahap.
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Klontong Admin — Lead Engineer Take-Home Test &nbsp;|&nbsp; Nuxt 3 + NestJS + PostgreSQL
+</footer>
+
+</body>
+</html>
