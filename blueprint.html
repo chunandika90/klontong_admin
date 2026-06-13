@@ -367,9 +367,16 @@ remove(@Param('id') id: number) &#123;
     <ul>
       <li><strong>Email verification</strong> — tidak ada SMTP setup; tidak kritis untuk assignment</li>
       <li><strong>Cursor pagination</strong> — offset pagination cukup untuk 100 produk</li>
-      <li><strong>Optimistic UI update</strong> — menambah kompleksitas state tanpa manfaat nyata di skala ini</li>
       <li><strong>Unit test frontend</strong> — backend unit test lebih kritis; Vitest setup butuh waktu lebih</li>
-      <li><strong>CI/CD pipeline</strong> — Docker Compose cukup untuk deliverable; GitHub Actions bisa ditambah setelah</li>
+      <li><strong>Image upload</strong> — hanya menerima URL eksternal; S3/Cloudinary butuh infra tambahan</li>
+      <li><strong>Restore produk UI</strong> — endpoint backend sudah ada (<code>PATCH /products/:id/restore</code>), UI belum dikerjakan</li>
+    </ul>
+    <h3 style="margin-top:16px;">Fitur Nice-to-Have yang Diimplementasi</h3>
+    <ul>
+      <li><strong>Search state persistence</strong> — filter (search, kategori, status, sort) disimpan ke URL query params sehingga tetap terjaga saat user back dari halaman detail</li>
+      <li><strong>CI workflow</strong> — GitHub Actions (<code>.github/workflows/ci.yml</code>) menjalankan build backend, frontend, dan docker compose check pada setiap push ke master</li>
+      <li><strong>Role-based UI</strong> — tombol Tambah, Edit, dan Arsip hanya tampil untuk user dengan role <code>admin</code>; staff hanya bisa melihat dan mencari produk</li>
+      <li><strong>Optimistic UI update</strong> — saat edit atau arsip produk, list diperbarui langsung di client sebelum API response; jika API gagal, list otomatis rollback ke state sebelumnya</li>
     </ul>
   </section>
 

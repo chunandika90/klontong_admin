@@ -23,7 +23,7 @@
             class="w-full aspect-square object-cover rounded-lg bg-gray-100"
             @error="($event.target as HTMLImageElement).src = 'https://placehold.co/300x300/e5e7eb/9ca3af?text=?'"
           />
-          <div class="flex flex-col gap-2">
+          <div v-if="authStore.isAdmin" class="flex flex-col gap-2">
             <button @click="openEditModal"
               class="w-full text-center bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors">
               Edit Produk

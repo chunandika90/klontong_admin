@@ -129,7 +129,7 @@
 </header>
 
 <div class="score-bar">
-  Score Compliance: <span>18 / 23 item terpenuhi (78%)</span> &nbsp;—&nbsp; Semua item WAJIB &amp; LEAD <span>100% ✅</span>
+  Score Compliance: <span>22 / 25 item terpenuhi (88%)</span> &nbsp;—&nbsp; Semua item WAJIB &amp; LEAD <span>100% ✅</span>
 </div>
 
 <div class="container">
@@ -197,7 +197,7 @@
         <div class="label">Bugs Fixed</div>
       </div>
       <div class="stat-card orange">
-        <div class="num">6</div>
+        <div class="num">2</div>
         <div class="label">Nice-to-Have Pending</div>
       </div>
     </div>
@@ -378,16 +378,16 @@
 
   <!-- Nice to have -->
   <section id="nicetohave">
-    <h2 class="section-title">Nice-to-Have Belum Diimplementasi</h2>
+    <h2 class="section-title">Nice-to-Have Diimplementasi</h2>
     <table>
-      <thead><tr><th>#</th><th>Item</th><th>Prioritas</th></tr></thead>
+      <thead><tr><th>#</th><th>Item</th><th>Prioritas</th><th>Status</th></tr></thead>
       <tbody>
-        <tr><td>N-1</td><td>Search state persistence (query tetap saat back dari detail)</td><td class="medium">Medium</td></tr>
-        <tr><td>N-2</td><td>Basic CI workflow (GitHub Actions)</td><td class="low">Low</td></tr>
-        <tr><td>N-3</td><td>Role-based access control (admin vs staff)</td><td class="medium">Medium</td></tr>
-        <tr><td>N-4</td><td>Optimistic UI update</td><td class="low">Low</td></tr>
-        <tr><td>N-5</td><td>Image upload (saat ini URL saja)</td><td class="medium">Medium</td></tr>
-        <tr><td>N-6</td><td>Restore produk dari UI (backend ada, frontend belum)</td><td class="medium">Medium</td></tr>
+        <tr><td>N-1</td><td>Search state persistence — filter tersimpan di URL query params, tetap saat back dari detail</td><td class="medium">Medium</td><td class="pass">✅ DONE</td></tr>
+        <tr><td>N-2</td><td>Basic CI workflow — GitHub Actions build backend + frontend + docker compose</td><td class="low">Low</td><td class="pass">✅ DONE</td></tr>
+        <tr><td>N-3</td><td>Role-based UI — tombol Edit/Arsip/Tambah hanya tampil untuk role admin</td><td class="medium">Medium</td><td class="pass">✅ DONE</td></tr>
+        <tr><td>N-4</td><td>Optimistic UI — list update langsung saat edit/arsip, rollback otomatis jika API error</td><td class="low">Low</td><td class="pass">✅ DONE</td></tr>
+        <tr><td>N-5</td><td>Image upload (saat ini URL saja)</td><td class="medium">Medium</td><td class="fail">❌ Not done</td></tr>
+        <tr><td>N-6</td><td>Restore produk dari UI (backend ada, frontend belum)</td><td class="medium">Medium</td><td class="fail">❌ Not done</td></tr>
       </tbody>
     </table>
   </section>
@@ -410,14 +410,16 @@
         <tr><td><strong>Nice</strong></td><td>Docker / docker-compose</td><td class="pass">✅ DONE</td></tr>
         <tr><td><strong>Nice</strong></td><td>Image fallback handling</td><td class="pass">✅ DONE</td></tr>
         <tr><td><strong>Nice</strong></td><td>Swagger / OpenAPI</td><td class="pass">✅ DONE</td></tr>
-        <tr><td><strong>Nice</strong></td><td>Search state persistence</td><td class="fail">❌ Not done</td></tr>
-        <tr><td><strong>Nice</strong></td><td>Basic CI workflow</td><td class="fail">❌ Not done</td></tr>
-        <tr><td><strong>Nice</strong></td><td>Role support (admin/staff)</td><td class="fail">❌ Not done (model ada, UI belum)</td></tr>
-        <tr><td><strong>Nice</strong></td><td>Optimistic UI update</td><td class="fail">❌ Not done</td></tr>
+        <tr><td><strong>Nice</strong></td><td>Search state persistence (URL query params)</td><td class="pass">✅ DONE</td></tr>
+        <tr><td><strong>Nice</strong></td><td>Basic CI workflow (GitHub Actions)</td><td class="pass">✅ DONE</td></tr>
+        <tr><td><strong>Nice</strong></td><td>Role UI — Edit/Arsip hidden untuk non-admin</td><td class="pass">✅ DONE</td></tr>
+        <tr><td><strong>Nice</strong></td><td>Optimistic UI update</td><td class="pass">✅ DONE</td></tr>
+        <tr><td><strong>Nice</strong></td><td>Image upload</td><td class="fail">❌ Not done (URL saja)</td></tr>
+        <tr><td><strong>Nice</strong></td><td>Restore produk UI</td><td class="fail">❌ Not done (backend ada, UI belum)</td></tr>
       </tbody>
     </table>
     <p style="margin-top:14px; font-size:0.9rem; color:#475569;">
-      <strong>Score: 18/23 item terpenuhi (78%)</strong> — Semua item <strong>WAJIB</strong> dan <strong>LEAD</strong> terpenuhi 100% ✅
+      <strong>Score: 22/25 item terpenuhi (88%)</strong> — Semua item <strong>WAJIB</strong> dan <strong>LEAD</strong> terpenuhi 100% ✅
     </p>
   </section>
 

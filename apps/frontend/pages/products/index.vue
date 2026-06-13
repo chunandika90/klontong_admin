@@ -5,7 +5,7 @@
         <h1 class="text-2xl font-bold text-gray-900">Produk</h1>
         <p class="text-sm text-gray-500 mt-0.5">{{ store.total }} produk ditemukan</p>
       </div>
-      <button @click="openCreate"
+      <button v-if="authStore.isAdmin" @click="openCreate"
         class="inline-flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors">
         + Tambah Produk
       </button>
@@ -119,9 +119,9 @@
                 <div class="flex justify-end gap-2">
                   <NuxtLink :to="`/products/${product.id}`"
                     class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">Detail</NuxtLink>
-                  <button @click="openEdit(product)"
+                  <button v-if="authStore.isAdmin" @click="openEdit(product)"
                     class="text-xs text-gray-600 hover:text-gray-800 font-medium">Edit</button>
-                  <button @click="confirmArchive(product)"
+                  <button v-if="authStore.isAdmin" @click="confirmArchive(product)"
                     class="text-xs text-red-500 hover:text-red-700 font-medium">Arsip</button>
                 </div>
               </td>
@@ -285,12 +285,25 @@ const store = useProductsStore()
 const categoriesStore = useCategoriesStore()
 const config = useRuntimeConfig()
 const authStore = useAuthStore()
+const route = useRoute()
+const router = useRouter()
 
-const searchInput = ref(store.query.search || '')
-const categoryFilter = ref<number | null>(store.query.categoryId ?? null)
-const statusFilter = ref<boolean | null>(store.query.isActive ?? null)
-const sortField = ref(store.query.sortBy || 'createdAt')
+// Init filters from URL query params (search state persistence)
+const searchInput = ref((route.query.search as string) || store.query.search || '')
+const categoryFilter = ref<number | null>(route.query.categoryId ? Number(route.query.categoryId) : (store.query.categoryId ?? null))
+const statusFilter = ref<boolean | null>(route.query.isActive !== undefined ? route.query.isActive === 'true' : (store.query.isActive ?? null))
+const sortField = ref((route.query.sortBy as string) || store.query.sortBy || 'createdAt')
 const archiveTarget = ref<Product | null>(null)
+
+function syncUrl() {
+  const q: Record<string, string> = {}
+  if (searchInput.value) q.search = searchInput.value
+  if (categoryFilter.value !== null) q.categoryId = String(categoryFilter.value)
+  if (statusFilter.value !== null) q.isActive = String(statusFilter.value)
+  if (sortField.value && sortField.value !== 'createdAt') q.sortBy = sortField.value
+  if (store.query.sortOrder === 'ASC') q.sortOrder = 'ASC'
+  router.replace({ query: q })
+}
 
 // Modal state
 const modalOpen = ref(false)
@@ -307,14 +320,15 @@ const form = reactive<Partial<Product>>({
 
 const debouncedSearch = useDebounce(searchInput, 400)
 
-watch(debouncedSearch, (val) => store.fetchProducts({ search: val, page: 1 }))
-watch(categoryFilter, (val) => store.fetchProducts({ categoryId: val, page: 1 }))
-watch(statusFilter, (val) => store.fetchProducts({ isActive: val, page: 1 }))
-watch(sortField, (val) => store.fetchProducts({ sortBy: val, page: 1 }))
+watch(debouncedSearch, (val) => { store.fetchProducts({ search: val, page: 1 }); syncUrl() })
+watch(categoryFilter, (val) => { store.fetchProducts({ categoryId: val, page: 1 }); syncUrl() })
+watch(statusFilter, (val) => { store.fetchProducts({ isActive: val, page: 1 }); syncUrl() })
+watch(sortField, (val) => { store.fetchProducts({ sortBy: val, page: 1 }); syncUrl() })
 
 function toggleSort() {
   const next = store.query.sortOrder === 'DESC' ? 'ASC' : 'DESC'
   store.fetchProducts({ sortOrder: next, page: 1 })
+  syncUrl()
 }
 
 function formatPrice(price: number) {
@@ -327,8 +341,17 @@ function confirmArchive(product: Product) {
 
 async function doArchive() {
   if (!archiveTarget.value) return
-  await store.archiveProduct(archiveTarget.value.id)
+  const target = archiveTarget.value
   archiveTarget.value = null
+  // Optimistic: remove from list immediately
+  const idx = store.items.findIndex(p => p.id === target.id)
+  if (idx !== -1) store.items.splice(idx, 1)
+  try {
+    await store.archiveProduct(target.id)
+  } catch {
+    // Rollback on error
+    await store.fetchProducts()
+  }
 }
 
 function resetForm() {
@@ -374,10 +397,19 @@ function closeModal() {
 async function submitModal() {
   modalSaving.value = true
   modalError.value = ''
+  const { id, categoryName, createdAt, updatedAt, ...payload } = form as any
+  const token = authStore.token
+  const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {}
+
+  // Optimistic update for edit
+  let prevItems: Product[] = []
+  if (editTarget.value) {
+    prevItems = store.items.map(p => ({ ...p }))
+    const idx = store.items.findIndex(p => p.id === editTarget.value!.id)
+    if (idx !== -1) Object.assign(store.items[idx], payload)
+  }
+
   try {
-    const token = authStore.token
-    const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {}
-    const { id, categoryName, createdAt, updatedAt, ...payload } = form as any
     if (editTarget.value) {
       await $fetch(`/products/${editTarget.value.id}`, {
         method: 'PATCH',
@@ -396,6 +428,8 @@ async function submitModal() {
     closeModal()
     await store.fetchProducts()
   } catch (e: any) {
+    // Rollback optimistic edit
+    if (editTarget.value && prevItems.length) store.items.splice(0, store.items.length, ...prevItems)
     const msg = e?.data?.message
     modalError.value = Array.isArray(msg) ? msg.join(', ') : msg || 'Gagal menyimpan produk'
   } finally {
@@ -404,8 +438,13 @@ async function submitModal() {
 }
 
 onMounted(async () => {
+  const initialQuery: Record<string, any> = {}
+  if (searchInput.value) initialQuery.search = searchInput.value
+  if (categoryFilter.value !== null) initialQuery.categoryId = categoryFilter.value
+  if (statusFilter.value !== null) initialQuery.isActive = statusFilter.value
+  if (sortField.value) initialQuery.sortBy = sortField.value
   await Promise.all([
-    store.fetchProducts(),
+    store.fetchProducts(initialQuery),
     categoriesStore.fetchCategories(),
   ])
 })
